@@ -1,0 +1,53 @@
+private void GetLatLongFromAddress(string street, string city, string state)
+{
+    string geocoderUri = string.Format(@"http://rpc.geocoder.us/service/rest?address={0},{1},{2}", street, city, state);
+    XmlDocument geocoderXmlDoc = new XmlDocument();
+    geocoderXmlDoc.Load(geocoderUri);
+    XmlNamespaceManager nsMgr = new XmlNamespaceManager(geocoderXmlDoc.NameTable);
+    nsMgr.AddNamespace("geo", @"http://www.w3.org/2003/01/geo/wgs84_pos#");
+    string sLong = geocoderXmlDoc.DocumentElement.SelectSingleNode(@"//geo:long", nsMgr).InnerText;
+    string sLat = geocoderXmlDoc.DocumentElement.SelectSingleNode(@"//geo:lat", nsMgr).InnerText;
+
+    Latitude = Double.Parse(sLat);
+    Longitude = Double.Parse(sLong);
+}
+
+
+
+
+<?xml version="1.0" encoding="UTF-8"?><GeocodeResponse><status>OK</status><result><type>bus_station</type><type>transit_station</type><type>establishment</type><formatted_address>Manyata Tech Park Bus Stop, Service Road, Manayata Tech Park, Nagavara, Bangalore, Karnataka 560045, India</formatted_address><address_component><long_name>Manyata Tech Park Bus Stop</long_name><short_name>Manyata Tech Park Bus Stop</short_name><type>bus_station</type><type>transit_station</type><type>establishment</type></address_component><address_component><long_name>Service Road</long_name><short_name>Service Road</short_name><type>route</type></address_component><address_component><long_name>Manayata Tech Park</long_name><short_name>Manayata Tech Park</short_name><type>neighborhood</type><type>political</type></address_component><address_component><long_name>Nagavara</long_name><short_name>Nagavara</short_name><type>sublocality</type><type>political</type></address_component><address_component><long_name>Bangalore</long_name><short_name>Bangalore</short_name><type>locality</type><type>political</type></address_component><address_component><long_name>Bangalore Urban</long_name><short_name>Bangalore Urban</short_name><type>administrative_area_level_2</type><type>political</type></address_component><address_component><long_name>Karnataka</long_name><short_name>KA</short_name><type>administrative_area_level_1</type><type>political</type></address_component><address_component><long_name>India</long_name><short_name>IN</short_name><type>country</type><type>political</type></address_component><address_component><long_name>560045</long_name><short_name>560045</short_name><type>postal_code</type></address_component><geometry><location><lat>13.0409338</lat><lng>77.6183653</lng></location><location_type>APPROXIMATE</location_type><viewport><southwest><lat>13.0395848</lat><lng>77.6170163</lng></southwest><northeast><lat>13.0422828</lat><lng>77.6197143</lng></northeast></viewport></geometry><partial_match>true</partial_match></result></GeocodeResponse>
+
+
+
+
+
+
+
+
+
+public void CallGeoCoder(string Address)
+		{
+			var web = new System.Net.WebClient ();
+
+			web.DownloadStringCompleted += delegate(object sender, System.Net.DownloadStringCompletedEventArgs e) {
+				//new UIAlertView ("Property Photo Browse Utility",result.ToString(),null, "Ok",null).Show ();
+
+			};
+
+			string sLat,sLong;
+			var	result=web.DownloadString ("http://maps.google.com/maps/api/geocode/xml?sensor=false&address=" + Address);
+			XmlDocument geocoderXmlDoc = new XmlDocument();
+			geocoderXmlDoc.LoadXml(result.ToString());
+			if (geocoderXmlDoc.SelectSingleNode ("GeocodeResponse/status").InnerText.ToUpper() == "OK".ToUpper()) {
+				sLat = geocoderXmlDoc.SelectSingleNode ("GeocodeResponse/result/geometry/location/lat").InnerText;
+				sLong = geocoderXmlDoc.SelectSingleNode ("GeocodeResponse/result/geometry/location/lng").InnerText;
+				new UIAlertView ("Property Photo Browse Utility", sLat.ToString () + "****" + sLong.ToString (), null, "Ok", null).Show ();
+
+			} else {
+				new UIAlertView ("Property Photo Browse Utility", "Error Occured: " + geocoderXmlDoc.SelectSingleNode ("GeocodeResponse/status").InnerText.ToString(), null, "Ok", null).Show ();
+
+			}
+
+
+
+		}
